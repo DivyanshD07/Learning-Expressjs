@@ -2,11 +2,27 @@ const express = require('express')
 const router = express.Router()
 
 router.get("/", (req, res) => {
+    console.log(req.query.name)
     res.send("Users List")
 })
 
 router.get("/new", (req, res) => {
-    res.send("Users New Form")
+    res.render("users/new", { firstname: "Test" })
+})
+
+
+//by default wwe cannot access body 
+//we have to use middleware in order to access body
+router.post("/", (req, res) => {
+    const isValid = true
+    if(isValid) {
+        users.push({ firstname : req.body.firstname })
+        res.redirect(`/users/${users.length - 1}`)
+    }else{
+        console.log("Error")
+        res.render("users/new", { firstname: req.body.firstname })
+    }
+    res.send("Hi")
 })
 
 // router.get("/:id", (req, res) => {
