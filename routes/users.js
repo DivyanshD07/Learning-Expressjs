@@ -1,9 +1,12 @@
 const express = require('express')
 const router = express.Router()
 
-router.get("/", (req, res) => {
-    console.log(req.query.name)
-    res.send("Users List")
+router.get("/", authorizeUsersAccess, (req, res) => {
+    if (req.query.name != undefined) {
+        console.log(req.query.name)
+    }
+    console.log(req.admin)
+    res.send("Users Page")
 })
 
 router.get("/new", (req, res) => {
@@ -15,10 +18,10 @@ router.get("/new", (req, res) => {
 //we have to use middleware in order to access body
 router.post("/", (req, res) => {
     const isValid = true
-    if(isValid) {
-        users.push({ firstname : req.body.firstname })
+    if (isValid) {
+        users.push({ firstname: req.body.firstname })
         res.redirect(`/users/${users.length - 1}`)
-    }else{
+    } else {
         console.log("Error")
         res.render("users/new", { firstname: req.body.firstname })
     }
@@ -45,12 +48,12 @@ router
         console.log(req.user)
         res.send(`users id ${req.params.id}`)
     })
-    .put((req,res) => {
+    .put((req, res) => {
         res.send(`update users is ${req.params.id}`)
     })
-    .delete((req,res) => {
+    .delete((req, res) => {
         res.send(`delete users id ${req.params.id}`)
-    })  
+    })
 
 
 //whenever it finds param it will run the code in this code it is "id"
@@ -59,11 +62,20 @@ router
 //param is middleware here
 //it will run before above code
 
-const users = [{ name : "Divyansh" }, { name : "Dhyani" }]
-router.param("id" , (req, res, next, id) => {
+const users = [{ name: "Divyansh" }, { name: "Dhyani" }]
+router.param("id", (req, res, next, id) => {
     req.user = users[id]
     next()
 })
+
+function authorizeUsersAccess(req, res, next) {
+    if (req.query.admin == "true") {
+        req.admin = true
+        next()
+    } else {
+        res.send("You are not an admin")
+    }
+}
 
 
 module.exports = router
